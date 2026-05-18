@@ -1,0 +1,31 @@
+{
+  "name": "إدارة الحمام",
+  "short_name": "حمام",
+  "description": "تطبيق إدارة تربية الحمام - سوق مزادات وتتبع التفريخ",
+  "start_url": "/pigeon-app-admin-v2.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f5f5",
+  "theme_color": "#00b4d8",
+  "lang": "ar",
+  "dir": "rtl",
+  "categories": ["lifestyle", "utilities"],
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/googlesamples/web-fundamentals/master/fundamentals/push-notifications/demos/notification-examples/images/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://raw.githubusercontent.com/googlesamples/web-fundamentals/master/fundamentals/push-notifications/demos/notification-examples/images/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "related_applications": [],
+  "prefer_related_applications": false
+}
