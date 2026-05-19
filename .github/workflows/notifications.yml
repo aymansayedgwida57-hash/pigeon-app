@@ -1,1 +1,20 @@
+name: Daily Hatch Notifications
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
 
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Notification
+        env:
+          ONESIGNAL_API_KEY: ${{ secrets.ONESIGNAL_API_KEY }}
+          ONESIGNAL_APP_ID: 5069d8da-a57f-4fcb-b8b7-8ac3cc764803
+        run: |
+          curl -X POST \
+            "https://onesignal.com/api/v1/notifications" \
+            -H "Authorization: Key $ONESIGNAL_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d "{\"app_id\": \"$ONESIGNAL_APP_ID\", \"included_segments\": [\"All\"], \"headings\": {\"ar\": \"إدارة الحمام 🕊️\"}, \"contents\": {\"ar\": \"تذكير بمتابعة التفريخ اليومي\"}}"
