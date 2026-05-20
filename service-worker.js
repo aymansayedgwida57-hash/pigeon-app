@@ -1,8 +1,12 @@
-const CACHE_NAME = 'pigeon-app-v1';
+const CACHE_NAME = 'pigeon-app-v2';
 const urlsToCache = [
   '/',
-  '/pigeon-app-admin-v2.html',
-  'https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap'
+  '/index.html',
+  'https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap',
+  'https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js',
+  'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js',
+  'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js',
+  'https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js'
 ];
 
 // تثبيت السيرفس ووركر
@@ -10,7 +14,7 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
       console.log('Cache opened');
-      return cache.addAll(urlsToCache);
+      return cache.addAll(urlsToCache).catch(err => console.log('Cache error:', err));
     })
   );
   self.skipWaiting();
@@ -31,10 +35,11 @@ self.addEventListener('activate', event => {
 
 // استرجاع الملفات - network first ثم cache
 self.addEventListener('fetch', event => {
-  // تجاهل طلبات Firebase (محتاجة اتصال دايماً)
+  // تجاهل طلبات Firebase و OneSignal (محتاجة اتصال دايماً)
   if (event.request.url.includes('firestore') ||
       event.request.url.includes('firebase') ||
       event.request.url.includes('googleapis.com/identitytoolkit') ||
+      event.request.url.includes('onesignal') ||
       event.request.url.includes('anthropic.com')) {
     return;
   }
@@ -42,7 +47,6 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     fetch(event.request)
       .then(response => {
-        // حفظ نسخة في الكاش
         if (response && response.status === 200) {
           const responseClone = response.clone();
           caches.open(CACHE_NAME).then(cache => {
@@ -52,8 +56,8 @@ self.addEventListener('fetch', event => {
         return response;
       })
       .catch(() => {
-        // لو فيه مشكلة في الاتصال، استخدم الكاش
         return caches.match(event.request);
       })
   );
 });
+
