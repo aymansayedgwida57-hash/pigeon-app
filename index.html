@@ -9,9 +9,17 @@
   function initOneSignalMedian() {
     if (window.median && median.onesignal) {
       median.onesignal.promptForPushNotifications();
-      median.onesignal.setExternalUserId({
-        externalId: localStorage.getItem('myUserId') || 'guest'
-      });
+      // انتظر Firebase UID يتحفظ في localStorage
+      const trySetExternalId = (attempts) => {
+        const uid = localStorage.getItem('myUserId');
+        if (uid && !uid.startsWith('user_')) {
+          median.onesignal.setExternalUserId({ externalId: uid });
+          console.log('OneSignal External ID set:', uid);
+        } else if (attempts > 0) {
+          setTimeout(() => trySetExternalId(attempts - 1), 2000);
+        }
+      };
+      trySetExternalId(10);
     }
   }
   document.addEventListener('median_onesignal_init', initOneSignalMedian);
@@ -3010,6 +3018,11 @@ function googleSignOut(){
 function onUserLoggedIn(user){
   myUserId = user.uid;
   localStorage.setItem('myUserId', myUserId);
+  // ربط Firebase UID بـ OneSignal فور تسجيل الدخول
+  if (window.median && median.onesignal) {
+    median.onesignal.setExternalUserId({ externalId: user.uid });
+    console.log('OneSignal External ID updated after login:', user.uid);
+  }
 
   // ===== تحقق المؤسس =====
   const FOUNDER_EMAIL = 'aymansayedgwida57@gmail.com'; // 👑 إيميل المؤسس
@@ -4149,7 +4162,21 @@ function confirmAdminAction(){
 
 // ===== ONESIGNAL NOTIFICATIONS =====
 function sendOneSignalNotification(title, message){
+  // إشعار داخلي دائماً
   showNotification('🔔 ' + title + ': ' + message);
+  // Push Notification حقيقي عبر Median
+  if (window.median && median.onesignal) {
+    try {
+      median.onesignal.postNotification({
+        contents: { ar: message, en: message },
+        headings: { ar: title, en: title },
+        include_external_user_ids: [myUserId]
+      });
+      console.log('Push sent:', title);
+    } catch(e) {
+      console.log('Push error:', e);
+    }
+  }
 }
 
 // ===== مزامنة مواعيد الفقس مع OneSignal =====
